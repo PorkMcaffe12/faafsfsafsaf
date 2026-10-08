@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Krypton Client</title>
+<link rel="icon" type="image/png" href="https://i.imgur.com/Xp8DabY.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#110c09}
+a{color:#e2c2a3;text-decoration:none}a:hover{color:#fff0e2}
+*{box-sizing:border-box}
+.nav{position:sticky;top:0;z-index:20;background:rgba(17,12,9,.86);backdrop-filter:blur(12px);border-bottom:1px solid #2a1d13}
+.navlink{color:#c2a993;font-size:15px;font-weight:500;padding:10px 6px}
+.navlink:hover{color:#f7ede4}
+.pill{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;font-weight:700;cursor:pointer;border:0;font-family:inherit}
+.pill-primary{background:#ff8a2a;color:#110c09}
+.pill-primary:hover{background:#ffa04f;color:#110c09}
+.pill-dark{background:#18110c;color:#fbf3eb;border:1px solid #3c2b1d}
+.pill-dark:hover{background:#241a11;color:#fff}
+.card{background:#1d150f;border-radius:16px}
+.h2{margin:0;text-align:center;font-weight:800;font-size:clamp(36px,5vw,52px);letter-spacing:-0.02em;color:#fcf6f0}
+.muted{color:#bf9d80}
+.icontile{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#ffb066,#e8641a);color:#110c09}
+.mod{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#1d150f;border-radius:10px;padding:0 16px;height:50px}
+.mod span.n{color:#faf2ea;font-weight:600;font-size:15px}
+.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600;border:1px solid;white-space:nowrap}
+.b-ok{color:#4ade80;background:rgba(34,197,94,.07);border-color:rgba(34,197,94,.32)}
+.b-risk{color:#facc15;background:rgba(234,179,8,.08);border-color:rgba(234,179,8,.38)}
+.b-off{color:#f87171;background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.38)}
+.tab{display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 16px;border-radius:8px;border:1px solid #36261a;background:#150f0b;color:#ff8a2a;font-weight:600;font-size:15px;cursor:pointer;font-family:inherit}
+.tab:hover{background:#1d140e}
+.tab-on{background:#ff8a2a;color:#110c09;border-color:#ff8a2a}
+.tab-on:hover{background:#ffa04f}
+.faq{width:100%;display:flex;align-items:center;justify-content:space-between;background:transparent;border:0;color:#fcf6f0;font-family:inherit;font-weight:700;font-size:18px;padding:22px 24px;cursor:pointer;text-align:left}
+.foot a{display:flex;align-items:center;gap:10px;color:#e2c2a3;font-size:15px}
+.foot a:hover{color:#f7ede4}
+.check{display:flex;align-items:center;gap:12px;color:#e2c2a3;font-size:15px}
+.video{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#1b130d;border:1px solid #302217}
+.mods-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:900px){.mods-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hidesm{display:none!important}}
+@media (max-width:600px){.mods-grid{grid-template-columns:minmax(0,1fr)}}
+
+
+.dl-tag{display:inline-flex;align-items:center;height:30px;padding:0 11px;border-radius:6px;border:1px solid #3f2d1f;background:#1d150f;color:#efdcca;font-size:13px;font-weight:600}
+
+.pumpkins{position:absolute;inset:0;pointer-events:none;z-index:0}
+.pk{position:absolute;top:-80px;animation:pkFall linear infinite;filter:drop-shadow(0 0 14px rgba(255,120,30,.35))}
+.pk svg{display:block;width:100%;height:100%;animation:pkSway ease-in-out infinite alternate;animation-duration:inherit}
+.pk-still{top:auto;animation:pkBob 5s ease-in-out infinite}
+@keyframes pkFall{from{transform:translateY(-80px)}to{transform:translateY(1150px)}}
+@keyframes pkSway{0%{transform:translateX(-18px) rotate(-14deg)}100%{transform:translateX(18px) rotate(14deg)}}
+@keyframes pkBob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-10px) rotate(4deg)}}
+@keyframes flicker{0%,100%{opacity:1}45%{opacity:.75}55%{opacity:.95}70%{opacity:.6}}
+.pk .face{animation:flicker 2.6s infinite}
+
+.vshade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 55%,rgba(0,0,0,.55))}
+.vplay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:68px;height:48px;border-radius:12px;background:#e3262d;display:flex;align-items:center;justify-content:center;transition:transform .2s,background-color .2s}
+.video:hover .vplay{transform:translate(-50%,-50%) scale(1.08);background:#ff3b3b}
+
+.hero-badge{display:inline-flex;align-items:center;gap:10px;margin-bottom:28px;padding:7px 14px 7px 12px;border-radius:999px;border:1px solid rgba(255,138,42,.35);background:rgba(255,138,42,.08);color:#ffb066;font-size:14px;font-weight:600}
+.hero-badge .dot{width:8px;height:8px;border-radius:50%;background:#ff8a2a;box-shadow:0 0 0 0 rgba(255,138,42,.6);animation:ping 2s infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(255,138,42,.6)}80%,100%{box-shadow:0 0 0 10px rgba(255,138,42,0)}}
+.scroll-cue{position:absolute;left:50%;bottom:36px;transform:translateX(-50%);width:26px;height:42px;border:2px solid #4d3726;border-radius:14px;z-index:1;opacity:0;animation:fadeUp .8s 1.6s forwards}
+.scroll-cue span{position:absolute;left:50%;top:8px;width:4px;height:8px;margin-left:-2px;border-radius:2px;background:#ff8a2a;animation:cue 1.8s infinite}
+@keyframes cue{0%{transform:translateY(0);opacity:1}70%{transform:translateY(14px);opacity:0}100%{opacity:0}}
+.menu-btn{display:none;width:44px;height:44px;background:transparent;color:#efdcca;border:1px solid #3c2b1d}
+.mobile-menu{display:none}
+@media (max-width:900px){
+  .menu-btn{display:inline-flex}
+  .mobile-menu{display:flex;flex-direction:column;gap:4px;max-height:0;overflow:hidden;padding:0 24px;transition:max-height .35s ease,padding .35s ease}
+  .mobile-menu.open{max-height:360px;padding:8px 24px 20px}
+  .mobile-menu a:not(.pill){color:#efdcca;font-size:17px;font-weight:600;padding:12px 4px;border-bottom:1px solid #2a1d13}
+}
+
+.legal{padding:110px 24px 90px}
+.legal-wrap{max-width:760px;margin:0 auto;color:#e2c2a3;font-size:16px;line-height:1.75}
+.legal-back{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:#bf9d80;margin-bottom:36px}
+.legal-back:hover{color:#ff8a2a}
+.legal-date{margin:0;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#ff8a2a}
+.legal h1{margin:10px 0 28px;font-size:clamp(36px,5vw,52px);font-weight:800;letter-spacing:-0.02em;color:#fcf6f0;line-height:1.1}
+.legal h2{margin:44px 0 12px;font-size:21px;font-weight:700;color:#fcf6f0}
+.legal p{margin:0 0 14px}
+.legal ul{margin:0 0 14px;padding-left:22px}
+.legal li{margin:6px 0}
+.legal li::marker{color:#ff8a2a}
+.legal strong{color:#f7ede4}
+.legal-wrap a:not(.legal-back){color:#ffa552;text-decoration:underline;text-underline-offset:3px}
+
+.dl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px;margin-top:56px;text-align:left;align-items:stretch}
+.dl-card{position:relative;display:flex;flex-direction:column;padding:30px 28px 28px;border-radius:18px;background:linear-gradient(180deg,#22180f,#1a120c);border:1px solid #2d2015;transition:transform .25s ease,box-shadow .25s ease}
+.dl-card:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(0,0,0,.4)}
+.dl-main{border:1px solid transparent;background:linear-gradient(180deg,#26190f,#1b120b) padding-box,conic-gradient(from var(--ang,0deg),rgba(255,138,42,.15),#ff8a2a,rgba(255,176,102,.25),rgba(255,138,42,.15),#ff8a2a,rgba(255,138,42,.15)) border-box;box-shadow:0 0 0 1px rgba(255,138,42,.08),0 24px 70px -24px rgba(255,120,30,.45);animation:spinBorder 8s linear infinite}
+@property --ang{syntax:'<angle>';inherits:false;initial-value:0deg}
+@keyframes spinBorder{to{--ang:360deg}}
+.dl-ribbon{position:absolute;top:-12px;right:22px;background:#ff8a2a;color:#110c09;font-size:12px;font-weight:700;border-radius:999px;padding:4px 12px;box-shadow:0 6px 18px rgba(255,120,30,.4)}
+.dl-logo{width:52px;height:52px;flex:0 0 52px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#ffb066,#e8641a);box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+.dl-logo-dark{background:#2d2016;box-shadow:inset 0 0 0 1px #3c2b1d;overflow:hidden}
+.dl-price{font-weight:800;font-size:60px;line-height:1;letter-spacing:-0.04em;background:linear-gradient(180deg,#ffc285,#ff8a2a 55%,#e8641a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.dl-feats{list-style:none;margin:24px 0 28px;padding:20px 0 0;border-top:1px solid #332418;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px}
+.dl-feats li{display:flex;align-items:center;gap:10px;font-size:14px;color:#efdcca}
+.ck{flex:0 0 20px;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,138,42,.14);color:#ff8a2a}
+.dl-cta{position:relative;overflow:hidden;width:100%;height:50px;font-size:15px;gap:10px}
+.dl-main .dl-cta::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-20deg);animation:shine 3.8s ease-in-out infinite}
+@keyframes shine{0%,60%{left:-60%}100%{left:130%}}
+.dl-req{margin-left:auto;color:#110c09;border-color:#ff8a2a;background:#ff8a2a}
+.dl-steps{margin:24px 0 28px;padding:20px 0 0;border-top:1px solid #332418}
+.dl-steps ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
+.dl-steps li{display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.5;color:#efdcca}
+.dl-steps .n{flex:0 0 24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;background:#2d2016;border:1px solid #3c2b1d;color:#ffa552;font-size:12px;font-weight:700}
+.dl-steps code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;background:#2d2016;border:1px solid #3c2b1d;border-radius:5px;padding:1px 6px;color:#ffb066}
+.dl-steps kbd{font-family:inherit;font-size:12px;font-weight:700;background:#2d2016;border:1px solid #4d3726;border-bottom-width:2px;border-radius:5px;padding:1px 6px;color:#fcf6f0}
+@media (max-width:420px){.dl-feats{grid-template-columns:minmax(0,1fr)}.dl-price{font-size:52px}}
+@media (prefers-reduced-motion:reduce){.dl-main{animation:none}}
+/* ---------- animations ---------- */
+.navlink.active{color:#f7ede4}.navlink.active::after{transform:scaleX(1)}
+@keyframes viewIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.view-in{animation:viewIn .5s cubic-bezier(.2,.7,.2,1)}
+@keyframes wordIn{from{opacity:0;filter:blur(10px);transform:translateY(18px)}to{opacity:1;filter:blur(0);transform:none}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes sway{0%,100%{transform:rotate(var(--r0))}50%{transform:rotate(var(--r1))}}
+@keyframes pulse{0%,100%{opacity:.55}50%{opacity:.9}}
+@keyframes popIn{0%{opacity:0;transform:scale(.6)}70%{transform:scale(1.08)}100%{opacity:1;transform:none}}
+.hero .w{display:inline-block;opacity:0;animation:wordIn .9s cubic-bezier(.2,.7,.2,1) forwards;animation-delay:calc(var(--d)*.18s + .15s)}
+.hero-in{opacity:0;animation:fadeUp .8s cubic-bezier(.2,.7,.2,1) forwards;animation-delay:calc(var(--d)*.18s + .2s)}
+.beams{position:absolute;inset:0;filter:blur(28px);pointer-events:none}
+.beam{position:absolute;top:-20%;width:46%;height:140%;pointer-events:none;transform-origin:50% 0;opacity:.7;animation:sway 9s ease-in-out infinite,pulse 6s ease-in-out infinite}
+.beam-l{left:-6%;--r0:14deg;--r1:22deg;background:linear-gradient(180deg,rgba(255,138,42,.15),rgba(255,138,42,0) 70%);clip-path:polygon(42% 0,58% 0,100% 100%,0 100%)}
+.beam-r{right:-6%;--r0:-14deg;--r1:-22deg;animation-delay:-4s,-2s;background:linear-gradient(180deg,rgba(255,138,42,.15),rgba(255,138,42,0) 70%);clip-path:polygon(42% 0,58% 0,100% 100%,0 100%)}
+.glow{position:absolute;left:50%;top:50%;width:720px;height:420px;transform:translate(-50%,-50%);background:radial-gradient(closest-side,rgba(255,120,30,.13),transparent);pointer-events:none;animation:pulse 7s ease-in-out infinite}
+.rv{opacity:0;transform:translateY(28px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--i,0)*90ms)}
+.rv.in{opacity:1;transform:none}
+.step .step-ic{opacity:0;transform:scale(.6)}
+.steps-in .step .step-ic{animation:popIn .6s cubic-bezier(.2,.7,.2,1) forwards}
+.steps-in .step:nth-child(3) .step-ic{animation-delay:.55s}.steps-in .step:nth-child(4) .step-ic{animation-delay:1.1s}
+.step-line{transform:scaleX(0);transform-origin:left;transition:transform 1.4s cubic-bezier(.4,0,.2,1) .2s}
+.steps-in .step-line{transform:scaleX(1)}
+.card,.mod,.video{transition:transform .25s ease,background-color .25s ease,box-shadow .25s ease}
+.card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(0,0,0,.35)}
+.mod:hover{background:#271b12;transform:translateY(-2px)}
+.video:hover{transform:translateY(-4px) scale(1.01)}
+.pill{transition:background-color .2s ease,color .2s ease,transform .2s ease}
+.pill:hover{transform:translateY(-1px)}.pill:active{transform:scale(.97)}
+.tab{transition:background-color .2s ease,color .2s ease,border-color .2s ease}
+.navlink{position:relative;transition:color .2s}
+.navlink::after{content:"";position:absolute;left:6px;right:6px;bottom:4px;height:1px;background:currentColor;transform:scaleX(0);transition:transform .25s ease}
+.navlink:hover::after{transform:scaleX(1)}
+.nav{transition:background-color .3s,box-shadow .3s}
+.nav.scrolled{background:rgba(17,12,9,.96);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.faq-item{transition:background-color .3s ease}
+.faq-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s cubic-bezier(.4,0,.2,1)}
+.faq-body>div{overflow:hidden}
+.faq-item.open .faq-body{grid-template-rows:1fr}
+.faq-ic{transition:transform .3s ease;display:flex}
+.faq-item.open .faq-ic{transform:rotate(45deg)}
+.pop{animation:fadeUp .45s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*18ms)}
+.lang{position:relative}
+.lang-menu{position:absolute;right:0;top:calc(100% + 6px);min-width:150px;background:#1d150f;border:1px solid #36261a;border-radius:10px;padding:6px;display:flex;flex-direction:column;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .2s,transform .2s;z-index:30}
+.lang.open .lang-menu{opacity:1;transform:none;pointer-events:auto}
+.lang-menu button{background:none;border:0;color:#efdcca;text-align:left;padding:10px 12px;border-radius:6px;font:inherit;font-size:14px;cursor:pointer}
+.lang-menu button:hover{background:#2d2016}
+#toTop{opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity .3s,transform .3s}
+#toTop.show{opacity:1;transform:none;pointer-events:auto}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.hero .w,.hero-in,.rv,.step .step-ic{opacity:1!important;transform:none!important;filter:none!important}.step-line{transform:none}}
+</style>
+<style>html{scroll-behavior:smooth}</style>
+</head>
+<body>
+<div id="top" style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#110c09;color:#f7ede4;min-height:100vh">
+
+<header class="nav">
+<div style="max-width:1260px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+<a href="#home" style="display:flex;align-items:center;gap:12px;color:#fff">
+<img src="https://i.imgur.com/Xp8DabY.png" alt="Krypton Client logo" width="40" height="40" style="width:40px;height:40px;object-fit:contain;border-radius:8px">
+<span style="font-weight:800;font-size:20px;letter-spacing:-0.01em">Krypton Client</span>
+</a>
+<nav class="hidesm" style="display:flex;gap:24px">
+<a class="navlink" data-view="home" href="#home">Home</a>
+<a class="navlink" data-view="modules" href="#modules">Modules</a>
+<a class="navlink" href="#download">Download</a>
+<a class="navlink" href="#reviews">Reviews</a>
+</nav>
+<div style="display:flex;align-items:center;gap:20px">
+<div class="lang"><button id="langBtn" class="pill" aria-expanded="false" style="background:transparent;color:#c2a993;gap:8px;font-weight:500;font-size:15px;height:44px" aria-label="Language">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>EN
+<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg>
+</button><div class="lang-menu" role="menu"><button role="menuitem">English</button><button role="menuitem">Español</button><button role="menuitem">Deutsch</button></div></div>
+<a class="pill pill-primary hidesm" href="#download" style="height:36px;padding:0 20px;font-size:15px;gap:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Download</a>
+<button id="menuBtn" class="pill menu-btn" aria-label="Open menu" aria-expanded="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+</div>
+</div>
+<div id="mobileMenu" class="mobile-menu">
+<a data-view="home" href="#home">Home</a><a data-view="modules" href="#modules">Modules</a><a href="#download">Download</a><a href="#reviews">Reviews</a>
+<a class="pill pill-primary" href="#download" style="height:46px;margin-top:8px;font-size:15px">Free Download</a>
+</div>
+</header>
+
+<main id="homeView">
+<section class="hero" style="position:relative;overflow:hidden;min-height:860px;display:flex;align-items:center;justify-content:center;text-align:center;padding:120px 24px;background:radial-gradient(ellipse 55% 60% at 50% 0%,#0c0806 0%,rgba(12,8,6,0) 70%),radial-gradient(ellipse 40% 70% at 0% 30%,#2c1709 0%,rgba(44,23,9,0) 70%),radial-gradient(ellipse 40% 70% at 100% 30%,#2c1709 0%,rgba(44,23,9,0) 70%),#171009">
+<div class="pumpkins" aria-hidden="true"></div><div class="beams"><div class="beam beam-l"></div><div class="beam beam-r"></div></div><div class="glow"></div>
+<div style="position:relative;z-index:1">
+<div class="hero-in hero-badge" style="--d:0"><span class="dot"></span>100% free · Fabric 1.21.11</div>
+<h1 style="margin:0;font-weight:800;font-size:clamp(48px,7vw,76px);line-height:1.04;letter-spacing:-0.035em;color:#faf2ea"><span class="w" style="--d:0">The</span> <span class="w" style="--d:1">most</span> <em class="w" style="--d:2;font-style:italic;color:#ffa552;padding-right:6px">powerful</em><br><span class="w" style="--d:3">client</span></h1>
+<p class="hero-in" style="--d:4;margin:28px 0 48px;font-size:21px;color:#ffa552">80+ modules. Lightweight. Built for survival servers.</p>
+<div class="hero-in" style="--d:5;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+<a class="pill pill-primary" href="#download" style="height:60px;padding:0 36px;font-size:18px;gap:10px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Free Download</a>
+<a class="pill pill-dark" href="https://discord.com/invite/kryptonofficial" target="_blank" rel="noopener" style="height:60px;padding:0 32px;font-size:18px">Join Discord</a>
+</div>
+</div>
+<a href="#why" class="scroll-cue" aria-label="Scroll down"><span></span></a>
+</section>
+
+<section id="why" style="max-width:1072px;margin:0 auto;padding:110px 24px 60px">
+<h2 class="h2">Why choose Krypton?</h2>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;margin-top:64px">
+<div class="card" style="padding:32px 32px 36px">
+<div class="icontile"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg></div>
+<h3 style="margin:28px 0 14px;font-size:22px;font-weight:700;color:#fcf6f0">High Performance</h3>
+<p class="muted" style="margin:0;font-size:15px;line-height:1.55">No FPS drops. Runs light so you can actually play.</p>
+</div>
+<div class="card" style="padding:32px 32px 36px">
+<div class="icontile"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 12a8 8 0 0 1-14 5.3M4 12a8 8 0 0 1 14-5.3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg></div>
+<h3 style="margin:28px 0 14px;font-size:22px;font-weight:700;color:#fcf6f0">Stable &amp; Updated</h3>
+<p class="muted" style="margin:0;font-size:15px;line-height:1.55">Updated frequently. Always compatible with the latest game patches.</p>
+</div>
+<div class="card" style="padding:32px 32px 36px">
+<div class="icontile"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2l9 5v10l-9 5-9-5V7l9-5z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg></div>
+<h3 style="margin:28px 0 14px;font-size:22px;font-weight:700;color:#fcf6f0">Instant Download</h3>
+<p class="muted" style="margin:0;font-size:15px;line-height:1.55">No account, no payment, no waiting. Click download and you are in.</p>
+</div>
+</div>
+
+<div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:180px">
+<div class="card" style="flex:999 1 560px;min-width:0;padding:34px 32px 60px">
+<div style="font-weight:700;font-size:16px;color:#fcf6f0">Easy to set up</div>
+<div class="muted" style="font-size:13px;margin-top:6px">Download it, put it in your mods folder. Done.</div>
+<div style="position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:64px;text-align:center">
+<div class="step-line" style="position:absolute;left:16%;right:16%;top:28px;height:1px;background:#4d3726"></div>
+<div class="step" style="position:relative">
+<div class="step-ic" style="width:56px;height:56px;margin:0 auto;border-radius:10px;background:#5865f2;display:flex;align-items:center;justify-content:center"><img src="data:image/png;base64,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" alt="Discord icon" style="width:30px;height:30px;object-fit:contain"></div>
+<div style="font-weight:700;font-size:15px;margin-top:22px;color:#fcf6f0">Download</div>
+<div class="muted" style="font-size:13px;line-height:1.5;margin-top:8px">Grab the latest .jar from the download section</div>
+</div>
+<div class="step" style="position:relative">
+<div class="step-ic" style="width:56px;height:56px;margin:0 auto;border-radius:10px;background:#38a8e8;display:flex;align-items:center;justify-content:center"><img src="data:image/png;base64,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" alt="Windows icon" style="width:28px;height:28px;object-fit:contain"></div>
+<div style="font-weight:700;font-size:15px;margin-top:22px;color:#fcf6f0">Drop it in</div>
+<div class="muted" style="font-size:13px;line-height:1.5;margin-top:8px">Place it in your mods folder</div>
+</div>
+<div class="step" style="position:relative">
+<div class="step-ic" style="width:56px;height:56px;margin:0 auto;border-radius:10px;background:#4caf3c;display:flex;align-items:center;justify-content:center"><img src="data:image/png;base64,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" alt="Minecraft icon" style="width:100%;height:100%;object-fit:cover;border-radius:10px"></div>
+<div style="font-weight:700;font-size:15px;margin-top:22px;color:#fcf6f0">Launch</div>
+<div class="muted" style="font-size:13px;line-height:1.5;margin-top:8px">Start the game and press Right Shift</div>
+</div>
+</div>
+</div>
+<div style="flex:1 1 300px;display:flex;flex-direction:column;gap:16px">
+<div class="card" style="padding:26px 24px 30px">
+<div style="font-weight:700;font-size:15px;color:#fcf6f0">Total users</div>
+<div style="font-weight:800;font-size:54px;letter-spacing:0.01em;margin-top:10px;color:#fcf6f0" id="userCount" data-target="12000">0</div>
+<div style="display:flex;align-items:center;gap:6px;color:#bf9d80;font-size:13px;margin-top:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>Growing this month</div>
+</div>
+<div class="card" style="padding:26px 24px">
+<div style="font-weight:700;font-size:15px;color:#fcf6f0">Compatible launchers</div>
+<div class="muted" style="font-size:13px;margin-top:6px">Works with Fabric 1.21.11 out of the box.</div>
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:18px">
+<div style="background:#2d2016;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:600;color:#efdcca;display:flex;align-items:center;gap:10px"><img src="data:image/png;base64,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" alt="" width="20" height="20" style="width:20px;height:20px;object-fit:contain;flex:0 0 20px">Minecraft</div>
+<div style="background:#2d2016;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:600;color:#efdcca;display:flex;align-items:center;gap:10px"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAWRUlEQVR42q16a5RdVZXuN9dae+/zqmdMNIJ0UAikqnhWkEdDV6VNKoUtYOvdRYPQtkKHVyohQcG+PS6nDraOoW0gTx6htS8iXM3hAu0DkiKSnMYG401BgKpKCIo0iEBi6n3O2Xuvx7w/TlUICA7s9vzbZ+y91pxrrTnX/L5vEv7YH+dFiFYqUo+d+evi529cUJX6XC35LGbb6oCPMFMjwaUAgEERAaMS/CpL8Twcdvkx/eyHp6x7YWaMjh15VdoJh0LB/THm0Ps3HBQiFEUqWgDoenH1R6S1IRM+Q4zTKSXTLAAyDGst2AJgV5uCCCQJpASEFGBmcNWUWYrdIHrQ6uSB7Qs2/RYAQg7lzBx/MgfynBcFqq1M9/7ej7GkG5jF57ycqufYwkQGcGwYcEyAYAhmCCISNefZMcEBcNOTCgihVFqBPAk7lYwCdK9I5K2PtK75z3fO+d9yoGNHXpUWFcxxj/QGxx2nbmJpv6TSXp2Z1HCONcAMhpKBEiKlIIjAxsFqC7a1+UkJKKUARXDOwcUWNjYOBEMMQUoolQtgKnqUHH2jet/Ta0qFknk/u0Hvx/juPb2nUZ26W2a8dj0ega01IICkVCoXwMUGnJiXwfSLQMunBbC/7Jk3Ibhc2wDkmsreh8oB5hul2wXoDKTUMeRJmKkEsM4AAEmhVH0KtpI8iXH791tP3zA8Y8Mf7cDMh12Dqy4Vab6bPJGxU4lhgEiQ9OpTMOVkAkBREN2f8+mp4jG3Vd/Pkbxszw3ZQ3X6HLbiMmL3WZHzs3oiBjNbAljmAgXjxnkq+cLWkzc99IecoD9k/JLnrlutGjJrbBTDWWeJAVXnS5fYRDDd7gyv27Zg3csz37XvXubNrg9E9bUJmjN7nnup9XXO7ZzLcw4O84HZLQQAczqH+chjccHgquNMwKtBvAxKSFPRFgwIX0rhCZgpd/Vjbevu6uC8KtHvO0HvbfzK1f4sb42ejC1bJghivyElTTV5Es70bjt+09Mz78+ZDYHhYVvseX/ZI+RQYgjywMEWN7OyFwz3npUouVHlvPZkLLJgJpIEmUsJOxZf1d+2fvO77QS9feAtskg9tuvZFZeqWf59ppwYtk6QIFZ1gXRls7563zM3lAol07EjrwDgyAH/ev+NR1dZnwFpT5aaPhLkMs3mULLlh6eu+X64JZTFnqJlMBGIp7MTdezskzPjdD/SG/Bx2KBywd/r8dgyM5EULFNS6jF30fZT1v3wnYGt3p4qe+xfPb38FJcV3zbVxB02PuNLM1H9cv+CTd8CM4V9PRKoHYU88mLXvrHPCiG/UOXkPJFROVISTjNso0QypbcCwIHZGQ+A/dyum6789NwbL6hOJuu3EW0vASbkUIYcyqLYEIOxbPG+3t/49UHBTsbGWSdcQuzlxL2Lh1YsLNL6F49MsWrmkhouDlP3/nWB1b/8HnkyxVPWkiT26gIVT0Rf2r5g05oOzqtO9LkCtjgQcdfwiiW/8Ca+JtPqDMcELhuYycgwYAE4lxjJQu4BgPRR9QwAv2uoLEw3NV5AOrlg6S9X9lMsv1KkW58Jt4QSN+dFRyfE9hMLt3Ttuw5efbqgx2PjEkuyXtWLRH835PDc4eIwwCAQWABAiC2i2FO0HP/qf6rmbJstRwbE8OpTyo7G67cv2LimffcyrwS4AhUciLB036p/VhnVDx9nJBOxNZORds5Z4Uvl5YIgmJVJg+GT5VcBoO7488z0Ys1LRiraxkbLQHVRmp/q2nfd9cWeos33AaXOPtvBedV/4qZbkjHzHa8hpUCAmYyN15Q+a2LoQyuLPUUbIhQAQHnOiwIKvOSFK+cJmR5ihwDOOZkNlK2YXWef0HTOMFqpBUNcQB937Py7IH1Uww+8+syF0UjZgZlBBJX1JAmCKSdvCCt3k8f7ZES/+tt959zdE/Y4EDgczPtjYuR1vyFoTsYjTQBBkPQbU5SMxpv6F6xfHm4JZTFs4bA4TGhpkeNqZLdMqZNsxRjySEhDk7DeiY+0futN9OVJDKOVQGAywT+qbJAmww5CCKc5JiuumDlrw8VhyqOPgrkND6iG1IXR6JQGM4QS0qsPJMf2P2TZXhwHYsHW1rUXPDp/3Zd/fPLaO3t6pou+fF40Ra8zsfiyLushvyHlgUiyY07GIu3PSl+3ZGjlhmJP0Xbs3CkQhii2FRKhzRVsYSEgWDtHjX6Do/hLIHBHJwQBQPezvUdzgP0ApZjZeA2BZ0Yqa7e13b6qY0dezTk4zMWeol08eM261Oy6FfFIVYNZykAJgMts+Uvb5q+/88hUnD5qRFZfm6A5Byv6nem1e39vwKT+gYTIs9VwxjkSZL3GtFf9XbL88ba1m0IO5YGdLVRaVDDnD/b+i2hOXaHHI01KKBg3np5wxz185qZDCgBY0aV+Y5CORyJNipSZTCYk8A0w09TAVVRaVDR/ObTyfL9erUhGqmbGeEf0pqnQhY+33fYLcF507ITo7IQr1C6cw+n187/Op+45thCBQR0783Lr/EIMoK9r38o95KnvC1jPaSv1RGy9NK355AvXPF7EnBc65sFr372MfC3+KZ5KLoagrNPWBk2pxkRX/geAuxSYye3tDU1imYnZywUUjVZ/sK3t9jc6eLYqtd9luvcHgbV2LRswmCE8AQBTtmrOf7xtwzPtu5d5A+gzpUVkSgD+en/v0capNmYsjKRpPyAnTl86tGLrNlp/VSfDlRjUPrBM9Z+47uElz626ROXkg+zYwliWmSCwsbwVVDi/BEQAMAC83D3Uu1PV+Z/S5dg5w6yV/BsAd9EFQ9e3JsI+wwSPHTuV8gTKfO6jbWuf7H6x1986f0PcPbzi86rR+9/xaGwhCH7Ol2Ys+dttJ224t333Mm+gfbNBX57QByx54dC9MpAXCcisCCScc7BlDb8phfjQ5Jf7F9zxrZkLMxwM/WJbMVk8tOLrQZP/D8loZEmApO8Jju1nBLMTnvqkdu5chjsWoBQcgxQRG66k40yrSEh3yqzy4NjIlCdcxfw6R6/9PxD4zOObNQOkLF9jNTMEWS/rSz2RPL7tpA33duzIq4EfzbV55AmFglu6f+T+oClzqYtdVlcTl4xH2ozHEQQ5M6UnhfOGwaAWDDEAFFuLOtwSStXCBT2e/EqmlQQDVhtmiQeR8x7mnFpGgWgBkIZjgEDOOCczXib2q+cKx/g4MwwIsQiEYck/K7YVk3Ze5hWo4C54bvkJ2qeFppIAgGTHkCy/Bn6rDClQwS3Zv/y7XkP64uRQVcOBCQAEeV5TKkUCsR2PLtrauv6RPPJ0GKgQ+MDsFtpKG2JlxJ0q5QEEBwaxY5iKNslYNbaRTgACebWkAyKGJDjYswUJ0anqAiWyfjbVmFN11dRzAJB7ea4EgMTjv1B1vgSgZaCkmzS/rLQ2/DvAmHNwmNHXx0v3XvsvQX3m8ni0okHwGMwi6wnJGKOIf8xT8dL+0+7Y0bEjr96Jsjo74QBQLPUPk8nIACSnLzyQEsqvTwV+Q8aHY43EHaJpH2AdQOIkpQzusQejOmGMcyYS7FLbAGBOedgBgLD+aQCBmJxISVCFSyUqmO79I0Gxpxh3Da78qv/BuivigxVNRB475/ymrNAT1WLWyZUPfXTN60dARDODrQ/sbKFSZ8EWqODAoJ9i44tdwyv2yaxqMxVjhSTBzh1wU3oHBJXg7HYf4gyXCe7XkxE748DEx6hHTtpw87uVvC2tLaZ2ZujP2DowM4EIsdKDAFD1JggAFJmDLkrAYAGQVblA2on4xw3PnXdJsafHhhzKFrRwgQou3FKrJIt4+70QYosoElkxuOoZ8mQbwWhVH6TsaPL9R1vWXT/z3tKh5XPJ1OACWQYYzap7f29Qfa1mDOYBnfPmJQUquEJf7aPIixp8lwIEEVkHz8gDADB1KLAAYDj4Hsrmn4SSdWydFkpIbeI3iz09tn33Mq9Im/UMHVOkgr1w7xfrrKo7x2XkhXqqunH7CXfsxdCQBGBZ2FdITBfIjqG0nBVyKKsDLUF7O6Kn9o1WYBwIRLUKhlJi6/wNcWnRPVFp0T1R6dh7osNntK+P3w4YuPY0vXa5ybncvb836G+7bQSavqtyHgDAlBNAyYsX776pYWDhZh0O5v085wWo4JbsXVEwQdNeK2irX5++lpxaBQCT/kgt5t+FgyhS0aZTML/HUPA0Hrjg2esvYmUIFpDpNKqx+ff+tttGOnZ2yhJgUjo14bICYNQiX9EHwi2hfKnzdSrR5vjsPVfPoRTNcollZpZsYFXOywHRnQAuKbYVEgBYum/F/1LNwc1mXMNpo+ODZSJHnzrryVXpuj2/SQCAGHPAfBhqWWVGj3SQnckKFcBpy0IIcpYjFXn2Aa8xpZx2kDmF9G+jCwH8KH3UyRIoGQb+k2QtjMEMkDt5urZxS/f1Xske9QlfHmUmEiYiAkGYqcT5jam/6Rq+TgsWL8PzuiBxph6JLTtHJAVJkiqleXn/ObdVg2l0Z4RtUcahhtoAsH0ZAGaO+JxKbs5EHcOSdpAkyNlRRcTPuao5xSYmsVL6mTj4GAB80Gum2qDVPQpZMEG42IKJzloydO1fCF/corJBh61omMnETrNvki0zEYlkLHJeNricPAGnHWw5YYAkEWmvwffMoegff3LqxgdnwPonB6/9UCLEqbZqAJCyiQWTfPZIMDSesidDSQYjIUmCE3pFEWOv8MTpNoZwxHI0Ey0EgGDe6xYAHPHPTFmDAM9GBgAvEJ5XkoFEMhZbAjMBUjUEpMfjilAiw845Agld0XY62qYDiOE3Z714dPL+x1pv//oMrgYAZeVnRVMmG09UtPCER5PJiG/UAABUj2+2AJAo3exDkMr5GZlSSKp2UDjQU2ACAdLFFnD483Aw9Df3zbXtvMx7rOXOQYrtDpX1iRkWIMHWQU8lDmCSGV+ptE+Y0vc5Y06yBt/0m9IC4ISYGYAUgfK8hpRS9SmVjEZPfDiYfUWe86KzE25OcZi79/cGVZ9XmThhAlhmPLaC+v/ttHVjIYeyNH1/NNim1TQWnY2q+wYq5kVm/g8lI+wwlCQQwreRdl7Gn5dMzjsThcITAwW4rsFVH+cUGp22DGI6nJcY5OUCctrtgbM3PnrC+semF/OmxXt7P5yeXXeZizRsZMDW7jUVu02Q96NDpeoT/Vet02DQsoFlqthT1EsGV97iN3sfS8YiCyLJ2pKDvONIYjmPPBVqCeHnAH4ebglvNqd+iAgM6trbu0tmvYWmkmi/Me3rsepmT9uvsO/f4iRdQ4qkqeraPtU4EasyvkTFrn10wdpVh7meIlAMiy4shmLs5KPuVh69SUY8XP5tbuBtfA4ztQ9cpQYWbtZdzy3/tKxTD7rYOHZgVRcoPRn99LGWTYvfSfDmOS+Gh6Beil7ngYW1+0WBwDRED8hAnmHLEGYyBhiXJJ74ZNDgH23GIrDmWpAqIZ22jgjEiWHn4xMdwyvaSi3rB49M0MUesgC++E7CbM7BYS6GRQciHgD00qHei5CS33fGsrMgUgKcGK00VgGgnTshwMyf2Lu8OVuvPlCgwgsAkpldAU0XjX/1wqqjDOx+BtKwDiQFkRSwibEEMHlSSV/BTCWHRErOsrFxYJCq84kTN2ad6X1s/sbv/R6k9CZoTnmeK7YWNAg8U8F2v9jrO6ibpETBGQdnrSMi6zWnPH0gWtV/0oa14ZZQHphdg5RLn7/2O6o5fbkt2586IR/kqfixx07Z+DIA0Ay4WDq4/NuqOf1FPV41YJIzV53XmCZb1SMy5q/6ibq/HERbvKZshx6pamaWwhNCpBRsbPsFiXUflCc/fs+xX4jeTSABgMUDy+pFOnjcb06fnoxVeZrVsP6sjJf8buqu/pZNV4ccSiBEkXps1+DyjyOjnkTipPAlgjl1qL4y9s/9Letv7OC8Ui0Yqq3MPvlNU04uhxAClgECC0+SqZjvYJK/+pPTaiRu9897L7Sy+pA/K/2X8aGqdcZZN5WQlwu6mLnr9eqel7r3rtrFiIdJykMmxlTT3jfuL1LRgpn0ZF85yI6lTJRYZrZE5HnNKS8ZKW/ub9l0dbgllEW0cFgsUvcjvYFT+LYkKa0zhi04+c34ZLaSuw0ASn1wokAFFyIU2xase8HFdp3fkJYMtgxi4SuiSvzKttPWvdzx63wq3BLKrWdtmHhlzxvnm3Fzl1/nS5lWkgCnpxJtyokTHn1U1MtLVEPmq7IuuN1vDL5bPuXD8wEgHOrzSosKBtY9LDwlVNr3pS+tGa3e1H/ixqvAeVEcauEOoEa0/Rnu8Or9NlONLQCoupRnjPvaQwu//nrIoUSh4AQAFFF04ZZQBlGST8aqwyrjKzDDlBOnPpDtW7z3mpWlYwvRgbCF8pwXwz3FZOv8W6/GpP4MWx72GlJKZT2PiISLrTYTcaTH40iPRmUSSChB55E1jWFsF4qItX1cTJg/33bixm/mOS/QB3R0QpSoYLqGr82rpuALeiI2YEDVBUqPVHY1tp63rrZLxRpemYF2LWEL/3jh5gq0u5Sti0gJYmYkk7H1sum1i4euW1migin01VJmuCWUP2lZ/1D06li7LbsrvCqekEJo1ZDyvIZUStUFKZHxsiLr+Yl0l9boxTcMAPhlDGAsXrx1/rpP/OS0jb8IOZTDGCbcUnClRQXTtb/3Zq8+02cmYsMWQgSSbGwmHevLi9RjW8IWBoHfk15fNLji0nSjf58tx8ZZFkQEVecLW0nWbLuv+UYUCq6Dp+n1I0SHC/euPEErcSacO9XT6hgyqJeeQGLNrz+clJdvXrhZz6S/mcDu2Jk/TK93/OvnU+nzmjeojLwyOYJeV4GSdtxetO1d6PX3FjgGr1vtN6fX6InYsmMC1QQOW46fcJHr7T9p47MA0MF5NWcIotgKA3qfGi8zhUM93pECx9Lh685GoDaojN+uR6t2WsqCzAXCjiXvT+B4pxNLB3tXywZ/jalosHUWALycL03iYgne4LNc/2/H3/rqkRJTblYs07qe65I3+KWoqbbS7cBHsdgd2DlE75SYugZXHScDu9qBrxKeEqacWIAgfCllTYK9elvbxvcvMf2eyPfc9Z9TGbGZPWRsOTHMIJIkvfoAdioZIxI/kOz9n1mvHdh1z6J7ovct8mX0OeTEZU7wZ0VOZc14cljkU7lAsbYTXNZ/918S+d7pxKd2X3e6bVR3i2xwupmIwDOyqBJKZgNwbOGS5CUG7UpH8mlB3v6pVPKmikQFPuDY5WDVXJI8n0XSToyPi5R/DHwBOxmDnTMAvSWzlqOnMBFfufX0u/7rMutbTnSo0qKS6X6kO8BxJ34Fkm+Qab/OTMbvLnSDwIZhjAGbaf7KE5CeBEkJOAsba9jYvV3orvPhynqUHX2zet8z3/qTCN3v3WogbyDHl6lcUGcTAxtpwNZaDWoFK0QtRU+3GtSaJhwDDgwQQZAQSqY9kE8wk2ZUsLiXdHTrI623/2lbDd6r2eOi51d/xHoi1MJ+hpw7XaRlGgQ4y2DjwJbxFkA/stmDwAxwZMosMACi/2vHzQPb29/W7OHe4h3+VA78gXabTz9/4wLt63Md7FmObRtIHs3MjXBIo4YpIwJGSfCrRGIQoKdSUv7s4Y/duv+/227z/wHC4NdIQyepqwAAAABJRU5ErkJggg==" alt="" width="20" height="20" style="width:20px;height:20px;object-fit:contain;flex:0 0 20px">Modrinth</div>
+<div style="background:#2d2016;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:600;color:#efdcca;display:flex;align-items:center;gap:10px"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACsAAAAwCAYAAACITIOYAAANZ0lEQVR42rWZbYxc1XnHf885596ZnX2318aAjcNbMLaVUNYkQA2LSYgqQapGyjhSk4AS3FY04Qui+ZBWjKdEVRVFqQqBkobSEiEUeemHkECoEmqWkPBiDCYljusQjIPBYNfe9e7M7My955ynH2bWr+v1GsiVZj+szj33f/7n//yf55xHeB9PZfOIq64b8wCVTeV0+Xl9n20NZBtWPrXgoyt+1vtKqy/cPzn+2iOrR0czgM0jFbdurOrf6/fkvby0aVPZrl8/GtqAbyouXeC+IOhXnJFLslLkgp/2cMkvBslKAe/jKxH5zu988tC6B6tNAC2XrYy23/+Dga1oxQBUpRrL5bL9k6/33KgiXyv2JCvyViCv+5iVAit+3m9WjPXErBTptqkpWEctz3aAfPOXkzu/v350NGilPZdUq/EDBauKjFI266XNxve23fxpK3JH0mXX5Jmn1fTBgIgak5UCK57u4+Kne8lKEYJGBe1yiS1YR8NnL6J659IH/vFRAN1UtpRHowh6KhxuProUGfMwGr63dcOwdVo1qbleValPNoOAGBHbXtUsbIgYAZo+j82Qa8mla4zID9/a8PXHfW7vkPV3bgXYXBlx66pj/j0xW9GK2chGFRG99xdfWFzoKfwdorckBecaU604A+SYyaJwPLMSj98ljQr0pUWTkfkFFzf+pVDIviF/fd8+VRU2bpSTScPMtoDK5hFXlWoUEX3gpZs3FHsLLxe63a0+j64xlQURMccDnbfuRIwxYg5Nt0KyYNoVBrg1qHm5dddX/0JEVKrVqJWK01mIlOPZrEp7Vfdv+/IfYfhWseiubU57fB68iMwpm/kw24kBbBo5Y+UUYtQn1joKCaHpNzez/Pae2/71JQCtVMzRLJtjPFOqsVIpp//2ypc2ipHnktReOzXZCj4Peiqgp+M/GoW+M5vYRBEVl/ugeb0ZbGrXFYvJs+GeWza+WimnMywfw+yMb973zBfXJL3u3kJ3ell9soVGggh23jhOxayABqHQk7N4RR3VExgPIljXXcC3shezZuuW7tseeFE3la2sHw2mUqmY9etHw31bbro16U+fsYm9rDbR9ET0dIC29WgQMe19NtL+HYMGVJS+s6fB6AnuIYJV0LzW9M66NcWu4jPZ3bfcKuvbvmzYCA/8+svf7l/SfVfe8mmz4YOIOGT+CUNog8xCg8w3EJcQG0200QJjQAQEYhC6F+QU+wPqZVYvEhARcXkzDzHENOkq3tX61oZvA9jLX/Ujps59oZtg+xMhqtGoiMg8QApGLHls4mOLs3ovZu2Zn2fVRz5D4cIP4Sen8Hv3QYxIkiBWGTqvwSnV316H0ZYSEh/Ty0tXTny89pTTxF0x8cLBeOCVgwxcuVAGPj6A7bLEZpzTiY1YfMzIfZMlPRdy6ZI/4/wFlx0ZcMVCeq64hNqWXzH56JNM79jN4PmRpAdCq032yVxfMogp+IuN5OdZ0iETZcJcYa9ateymQtEN53nQxv/WTOO3dWzJUTizANagPrYVIUfYFIRmmKI7GeTKpX/O1R+6mYWlpZ0gie2hqoCQnn0GPSMfww310RVew9THIUlPRCuAByKEpUJr2BCWWQBNjbWtLOyyV61a9ldizIdDjNiClTDlqf3PIVpvt0iGEgpDBVRBg2KNJdcMVc+qRZ/kuvO+ytL+1RgxbZAibfkc/tGWgLUUzjsHu+pyQp4je1+HGMAlnagDckUHDdklDn+RgVSQvB2VaWrF+7DXIWahdljQqEgiSOJo7KwxvatO3/AAg1cNkQwkNGpTLCgu5arlN7Ks7yNHmJxxgVn10vl/jEipj+STXyRcOEx86mFk/x7ElgjFiF9pCeca1AmS6RG2FWJUgIX26tXLbxORRVFV5SgHkEQAYXrXNI3f1PC0uPjiq7nhor9hsLiUqLETuma+vtaWhipmcDF21ZWEyf3kpbfIP1YkLhEkgIQOSDn8mlpjxAedNJHYDcoJVtWJL1uy5JMZ4z+Z4JzJtfhme7lGDKcu6mYBbAygNKPl4GWfIhsuQUGRbPbSSlUkqiJKt0O1qDpH+aWgJtI7OEQeI6+/tpP+/j4WLTmTQqEwU0nNy+oAvPeMj49Tq9URIsXQAzpO28/0ZPU0ihYdQnrK4jsoLimQFooIMDF+kKmpGkOLFrFw0SKMObUUVJXJyUkOHTpECKHzTorGBEHn3KROTKUOxJ1qNxXFuRQxhhgjziWoBt7d+zaHJsZZdMYS+gcGTspyvV5nYmKCLMswxhxenGKIJOhcYDtSB5wTDotP5hptrO3k/dCZWHDOkbVavLl7FxMH+1m8ZAldpdLhN7MsY3x8nEajgYhgre2wNDNzxIjFHoY7K2QxAmrUOEWMzCdSjDmBsRkWnXHUpiap16YYHBpiwcIh6vU6U5NTRI1HmDymzFLA0QqWPFrAoaKIgh5VNqiCMUKI0bj5h7TMqakZ1v7v3X3UanWSNEVE2q5xsvLHKD98+0z21CypdW07nOVrIoKqqpPDJnUK3cbYPubOGQTgnEUAY8xxTM5qNEwHoeENPlqU2RcmRogxqkOJ7TzdSWOzTSmCBo9qPEkFciLoeT2qRA1YASsnDTNtZ3GNDvDC3GIQEXyeE2Pkg3xUI75DgM6BQRAUkxtBs1OW2SJkeROfZ+/1xmlWCD5GsuAR5eRQO/utaG4UmnMxG1Vx1pLVa4SsSVpICcG/L5ghKqk1eHIyncZZIaqc1ONFBFGaRoW6SBv68QsCcEYIGHbtm+AHD/07zXqN7p5eYgynp89OVMSo9BQtjTzwH08eYOeOJYSQkiT+8JjjdlURwUDdrl29/IvWyNIYj626bMd9DzRydk+0mA7CW79/nW0vb2Hx4rNYds65bc15f0K6tS7BumPPLjEoiTOUCpZtb9T4zk/eYsdb0/hGLwf39QNKqbeJs5EY5eg4VpdY8SH+zl61etlnnLUfDrF98LLtyysmm543JzIO1P3hC4a0UKA2eYgXnnuaAwf2s/zcCxhcMESeZ8QYDyeNo8F2pqXUU+DgVM7DT7/Lw8/so9GMFAsGMZEQLBMH+pmc6CZJPV3drc79ggFQmyQSfHzFrl29fJ015tKoMTpjTNMrb022eGcqI4+KO+o4rapYl+Cs5bWd29m65VmMCMs/dB5dpe7DoK1LMLZdRXX1pEQfeeHJ33Lv0/v51dtNSqnBWulseZtFayNZK+XgvkGa00VK3U0KxQxVic4lJnj/tF27avnqYmLWtUJkXy03eyaaTOcRM3NEmTU8oVDoIms12Lb1eba/uo2uUjdLly6nUCxirKHU1wUq/Ob53fzo/ufZ9l878DYlLh5EfODE9NKuUsQojVqJg/sHiN5Q6p3WYrfgW+E/5W8/98fX1Dyb94w3Q9NHY00b4nxCp33mMrSa04QYuOCilaxd9ylWrhpm35sZW3+6g9/v2IcYoVh0BIQ3Vl1EXiwic3i2iKJq8LloqTuLyy6csv39+6+x1/76y7//1aLf9CWJuxIiOnOomneEK8450jRl/7vvsnXLGDueO8Drz2ZMHJigUEqx1hAA6z0mRKYWDmLiXNlQUNXgHGLSheadN+SfHnj3c/fbMcbktd1vP3HBsiUHjZhPOGuSqNF3ZpLTAZ2mKTYR0riYvq5lmOTI8UgANYZivcF0bzdZV1eb3RMAq6IaXKHbISbzvn7bE/9w3Z1cgxgglstl+6OxrXe3oqwNUbakSeIAUdXTalLEGNHY1ruq0r42PjYTCjC05x2kU3Mct+AAIklpwGkIW3xWW/v43193d7m8yVKtRguwfft2HRkZcT8b++UeWxp4sK9koxG50lmbhBgDIiLzYLmdwz0lexZd9iyUcOI51BgK0018IWW6t2dGu6oQk2K3VdUsxPwbr2/f/KVnv/uXb45UNrvH770hAEduCXfv3h0rFcwjj+z3O9/Y+9RF55z9mBouTJw7H1VR1MPcWp4PWOn8KTSmmRxagIp4axObFHtMCK3/NsGv//Gdn/jB/u1joVJR82D13DBXRS0jIyN2bKzdjLjh2uENVrXqnDsrzz2qGmSm4TEL2KBNFiZrWJAOE7Q162WkimCzPBxYdraduGgF2qi9rWIqP66O3A8wUtnsxqrrwvGmNOtHZ1geG4Odu/a+dM6Zix4y1hRFGE6cdSHE2P7msaKbD7OqbcsppCWbNJu+1lu6p+HC55+ofuLnqEqFjceweVp9sJGRETfD8vXrLh12YqpW5HpF8T6E9nVqu8Sfi1lVIqimrmARIUT/WCBU7nrs9q1HsfneWkvHjyuXy2a008K84eo1n7aWO5yVNTEqPrRBGxFzPFhUIqgmNrXWOvKQvxjxd/7zY7c/ClDepHa0TERETx3Ap9MOrbQZrFaJULZ/um7XjQJfc86siDESvMagTYbSNWYwGY5BW6SuYJxxtHxrh2j85p6e574/OjoaKp12aPWDboce/5TLZTvD8sjISHHANr6gGr9ixV4SmWbADHNG8XICTVTZRoz3HGgceujBsXajuVzeZEdH1/9hG81z6XnlypXphWd0fzZofcNQcvlHh9LLXsli4/69PZOPjI5WM4DKSMVV30cL//8B2MrceX0e9VQAAAAASUVORK5CYII=" alt="" width="20" height="20" style="width:20px;height:20px;object-fit:contain;flex:0 0 20px">Prism</div>
+<div style="background:#2d2016;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:600;color:#efdcca;display:flex;align-items:center;gap:10px"><img src="data:image/png;base64,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" alt="" width="20" height="20" style="width:20px;height:20px;object-fit:contain;flex:0 0 20px">Dawn</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section style="max-width:1200px;margin:0 auto;padding:120px 24px 40px;text-align:center">
+<h2 class="h2">See <span style="color:#ffa552">Krypton</span> in Action</h2>
+<p style="margin:16px 0 0;color:#bf9d80;font-size:17px">Watch Krypton on your favourite server</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;margin-top:60px">
+<div id="videos" style="display:contents"></div>
+</div>
+</section>
+
+<section id="download" style="position:relative;overflow:hidden;padding:160px 24px 80px;text-align:center;background:radial-gradient(ellipse 55% 45% at 50% 50%,rgba(255,120,30,.09),transparent)">
+<div class="pumpkins" aria-hidden="true"></div>
+<div style="position:relative;z-index:1;max-width:940px;margin:0 auto">
+<div style="font-size:12px;font-weight:700;letter-spacing:.16em;color:#ffa552">DOWNLOAD</div>
+<h2 class="h2" style="margin-top:14px">Get Krypton</h2>
+<p style="margin:16px 0 0;color:#bf9d80;font-size:18px">Free download. Grab it and start playing.</p>
+
+<div class="dl-grid">
+
+<div class="dl-card dl-main">
+<span class="dl-ribbon">Recommended</span>
+<div style="display:flex;align-items:center;gap:14px">
+<div class="dl-logo dl-logo-dark"><img src="https://i.imgur.com/Xp8DabY.png" alt="Krypton Client logo" width="36" height="36" style="width:36px;height:36px;object-fit:contain;border-radius:6px"></div>
+<div>
+<div style="font-weight:700;font-size:19px;color:#fcf6f0">Krypton Client</div>
+<div style="font-size:13px;color:#bf9d80;margin-top:3px">Latest build · Fabric 1.21.11</div>
+</div>
+</div>
+<div style="display:flex;align-items:baseline;gap:12px;margin-top:28px">
+<span class="dl-price">FREE</span><span style="font-size:14px;font-weight:600;color:#bf9d80">€0 · forever</span>
+</div>
+<p style="margin:12px 0 0;font-size:14px;line-height:1.65;color:#e2c2a3">No payment, no account, no waiting. Download Krypton and start playing instantly.</p>
+<ul class="dl-feats"><li><span class="ck"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span>Sus Chunk Finder</li><li><span class="ck"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span>Block ESP</li><li><span class="ck"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span>Auto base finding</li><li><span class="ck"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span>Auto-farm &amp; utility</li><li><span class="ck"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span>Regular updates</li><li><span class="ck"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span>Discord support</li><li><span class="ck"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span>More free modules</li><li><span class="ck"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span>No account needed</li></ul>
+<a class="pill pill-primary dl-cta" href="https://Buzzer.com/abcd" target="_blank" rel="noopener" style="margin-top:auto"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Official Free Download</a>
+<p style="margin:14px 0 0;font-size:12.5px;color:#8e7462;text-align:center">Needs Fabric API to run. Grab it alongside.</p>
+</div>
+
+<div class="dl-card">
+<div style="display:flex;align-items:center;gap:14px">
+<div class="dl-logo dl-logo-dark"><img src="https://i.imgur.com/iDBB6Qa.png" alt="Fabric API logo" width="36" height="36" style="width:36px;height:36px;object-fit:contain;image-rendering:pixelated"></div>
+<div>
+<div style="font-weight:700;font-size:19px;color:#fcf6f0">Fabric API</div>
+<div style="font-size:13px;color:#bf9d80;margin-top:3px">Latest for 1.21.11</div>
+</div>
+<span class="dl-tag dl-req">Required</span>
+</div>
+<p style="margin:22px 0 0;font-size:14px;line-height:1.65;color:#bf9d80">Required dependency for Krypton to run. Already have it in your mods folder? Skip this one.</p>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+<span class="dl-tag">1.21.11</span><span class="dl-tag">Fabric</span><span class="dl-tag">Official</span>
+</div>
+<div class="dl-steps">
+<div style="font-size:12px;font-weight:700;letter-spacing:.12em;color:#8e7462;margin-bottom:14px">INSTALL IN 3 STEPS</div>
+<ol>
+<li><span class="n">1</span><span>Download Krypton and Fabric API</span></li>
+<li><span class="n">2</span><span>Drop both <code>.jar</code> files into <code>.minecraft/mods</code></span></li>
+<li><span class="n">3</span><span>Launch the Fabric 1.21.11 profile and press <kbd>Right Shift</kbd></span></li>
+</ol>
+</div>
+<a class="pill pill-dark dl-cta" href="https://modrinth.com/mod/fabric-api" target="_blank" rel="noopener" style="margin-top:auto"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Download Fabric API</a>
+</div>
+
+</div>
+</div>
+</section>
+
+<section id="reviews" style="max-width:944px;margin:0 auto;padding:160px 24px 60px">
+<h2 class="h2">What our users say</h2>
+<p style="margin:14px 0 0;text-align:center;font-size:13px;color:#8e7462">Example reviews for this demo. Replace with real customer reviews.</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:64px">
+<div id="reviewList" style="display:contents"></div>
+</div>
+<div class="card" style="margin-top:16px;padding:22px 24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+<div style="width:48px;height:48px;border-radius:10px;background:#342519;display:flex;align-items:center;justify-content:center;color:#e2c2a3"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></div>
+<div style="flex:1 1 280px">
+<div style="font-weight:700;font-size:17px;color:#fcf6f0">More reviews in our community</div>
+<div class="muted" style="font-size:15px;margin-top:4px">Join the community: real feedback, instant support, latest updates.</div>
+</div>
+<a class="pill pill-primary" href="https://discord.com/invite/kryptonofficial" target="_blank" rel="noopener" style="height:42px;padding:0 20px;font-size:15px">Join Discord</a>
+</div>
+</section>
+
+<section style="max-width:816px;margin:0 auto;padding:160px 24px 60px">
+<h2 class="h2">Frequently asked questions</h2>
+<div style="display:flex;flex-direction:column;gap:12px;margin-top:64px">
+<div id="faqs" style="display:contents"></div>
+</div>
+</section>
+
+</main>
+<section id="modulesView" hidden style="max-width:1072px;margin:0 auto;padding:110px 24px 80px">
+<h2 class="h2">All 82+ Modules</h2>
+<p style="margin:20px 0 0;text-align:center;color:#e2c2a3;font-size:19px">Full list of modules and their current status.</p>
+<div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:48px">
+<span class="badge b-ok" style="font-size:15px;padding:9px 18px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><span id="nOk"></span> Stable</span>
+<span class="badge b-risk" style="font-size:15px;padding:9px 18px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M12 8v5M12 16h.01"/></svg><span id="nRisk"></span> Unstable</span>
+<span class="badge b-off" style="font-size:15px;padding:9px 18px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/></svg><span id="nOff"></span> Disabled</span>
+</div>
+<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:40px">
+<div id="tabs" style="display:contents"></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:56px;margin-top:56px">
+<div id="shown" style="display:contents"></div>
+</div>
+<p style="text-align:center;color:#e2c2a3;font-size:16px;margin:56px 0 0">Showing <span id="shownCount"></span> of 82 modules</p>
+</section>
+
+<section id="termsView" class="legal" hidden>
+<div class="legal-wrap">
+<a href="#home" class="legal-back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>Back to home</a>
+<p class="legal-date">Last updated: October 8, 2026</p>
+<h1>Terms of Service</h1>
+<p>These Terms of Service ("Terms") cover your use of the Krypton Client website, the Krypton Client download and anything else we provide ("we", "us", "our"). By using the site or the client, you agree to these Terms. If you do not agree, please do not use them.</p>
+<h2>1. Who can use Krypton</h2>
+<p>You must be old enough to agree to these Terms where you live, or have a parent or guardian's permission. You are responsible for following the laws that apply to you.</p>
+<h2>2. The software</h2>
+<p>Krypton Client is free. There is no account to create, no license key and nothing to pay. You may download it and use it on your own devices for personal use.</p><p>You may not sell Krypton Client, bundle it with other software, or re-upload modified copies and present them as official builds.</p>
+<h2>3. Acceptable use</h2>
+<p>You agree not to:</p><ul><li>Use Krypton Client or this site to spread malware or take over other people's accounts</li><li>Attack, overload or try to break into our website or systems</li><li>Pretend to be us, or claim we are linked to Mojang, Microsoft or any server</li><li>Harass staff or other users in our community spaces</li></ul>
+<h2>4. Multiplayer servers and game rules</h2>
+<p>Krypton Client is an unofficial, third-party Minecraft modification. Many multiplayer servers do not allow modified clients, and using one can lead to kicks, bans or other penalties. Check each server's rules before you play. You use Krypton Client at your own risk, and we are not responsible for any action a server takes against you or for items, progress or accounts you lose.</p>
+<h2>5. No affiliation</h2>
+<p>Krypton Client is not affiliated with, endorsed by or connected to Mojang AB, Microsoft Corporation or any Minecraft server. Minecraft is a trademark of Mojang Synergies AB.</p>
+<h2>6. Updates and availability</h2>
+<p>We may change, pause or stop any part of Krypton Client, the Minecraft versions it supports or this website at any time. We try to keep things working, but we cannot promise every update will work on every setup.</p>
+<h2>7. No warranty</h2>
+<p>Krypton Client and this website are provided "as is" and "as available", without warranties of any kind, to the fullest extent the law allows.</p>
+<h2>8. Limitation of liability</h2>
+<p>To the fullest extent the law allows, we are not liable for indirect or consequential losses, including lost data, lost game progress or lost accounts, that come from using the site or the software. Because Krypton Client is free, our total liability for any claim is limited to €0 where the law permits.</p>
+<h2>9. Changes to these Terms</h2>
+<p>We may update these Terms from time to time and will change the "Last updated" date when we do. If you keep using Krypton Client after a change, you accept the updated Terms.</p>
+<h2>10. Contact</h2>
+<p>Questions about these Terms? Reach us through <a href="https://discord.com/invite/kryptonofficial" target="_blank" rel="noopener">our Discord</a>.</p>
+
+</div>
+</section>
+<section id="privacyView" class="legal" hidden>
+<div class="legal-wrap">
+<a href="#home" class="legal-back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>Back to home</a>
+<p class="legal-date">Last updated: October 8, 2026</p>
+<h1>Privacy Policy</h1>
+<p>This Privacy Policy explains what information is handled when you visit the Krypton Client website or download the client, and what we do with it. Short version: Krypton has no accounts and no payments, so we collect very little.</p>
+<h2>1. What we collect</h2>
+<ul><li><strong>Nothing you type in.</strong> There are no sign-ups, logins or checkout forms on this site.</li><li><strong>Basic server logs.</strong> Like most websites, the server that hosts this page may record your IP address, browser type, the pages you open and when, for security and to keep the site running.</li><li><strong>Messages you send us.</strong> If you contact us on Discord, we see what you send there.</li></ul>
+<h2>2. How we use it</h2>
+<ul><li>To deliver the website and the download</li><li>To keep the site secure and stop abuse</li><li>To answer support questions</li></ul><p>We do not sell personal information, and we do not use it for advertising.</p>
+<h2>3. Cookies</h2>
+<p>This site does not set its own tracking or advertising cookies. Your browser may keep normal cached files so the page loads faster.</p>
+<h2>4. Third-party services on this page</h2>
+<p>Some parts of the page load content from other companies, which can see your IP address when they do:</p><ul><li><strong>Google Fonts</strong> serves the typeface used on the site.</li><li><strong>YouTube</strong> shows video thumbnails, and loads the player only after you click a video (using its privacy-enhanced mode).</li><li><strong>Imgur</strong> hosts the Fabric API image.</li><li><strong>Discord</strong> and <strong>Modrinth</strong> open when you follow their links.</li></ul><p>Each of these services has its own privacy policy.</p>
+<h2>5. How long we keep data</h2>
+<p>Server logs are kept only as long as needed for security and running the site, then deleted. Support messages stay on Discord under Discord's own rules.</p>
+<h2>6. Children</h2>
+<p>Krypton Client is not aimed at children under 13 (or the minimum age where you live). If you think a child has sent us personal information, contact us and we will delete it.</p>
+<h2>7. Your choices</h2>
+<p>Depending on where you live, you may have the right to ask what data we hold about you, or to have it corrected or deleted. Contact us to make a request.</p>
+<h2>8. Changes</h2>
+<p>We may update this policy from time to time and will change the "Last updated" date when we do.</p>
+<h2>9. Contact</h2>
+<p>Privacy questions? Reach us through <a href="https://discord.com/invite/kryptonofficial" target="_blank" rel="noopener">our Discord</a> and open a support ticket.</p>
+
+</div>
+</section>
+<footer style="border-top:1px solid #2a1d13;margin-top:40px">
+<div style="max-width:1200px;margin:0 auto;padding:70px 24px 40px">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:40px">
+<div class="foot">
+<div style="font-weight:700;font-size:17px;color:#fcf6f0;margin-bottom:22px">Navigation</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<a href="#home"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-7 9 7v9h-6v-6H9v6H3z"/></svg>Home</a>
+<a href="#modules"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><rect x="14" y="14" width="6" height="6"/></svg>Modules</a>
+<a href="#download"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Download</a>
+<a href="#terms"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h8l4 4v14H6z"/></svg>Terms of Service</a>
+<a href="#privacy"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Privacy Policy</a>
+</div>
+</div>
+<div class="foot">
+<div style="font-weight:700;font-size:17px;color:#fcf6f0;margin-bottom:22px">Socials</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<a href="https://discord.com/invite/kryptonofficial" target="_blank" rel="noopener"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H9l-5 4z"/></svg>Discord Server</a>
+</div>
+</div>
+<div>
+<div style="font-weight:700;font-size:17px;color:#fcf6f0;margin-bottom:22px">Requirements</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap"><span style="background:#22180f;border:1px solid #36261a;border-radius:6px;padding:6px 10px;font-size:13px;font-weight:700;color:#e2c2a3">Fabric 1.21.11</span><span style="background:#22180f;border:1px solid #36261a;border-radius:6px;padding:6px 10px;font-size:13px;font-weight:700;color:#e2c2a3">Fabric API</span><span style="background:#22180f;border:1px solid #36261a;border-radius:6px;padding:6px 10px;font-size:13px;font-weight:700;color:#e2c2a3">Java 21</span></div>
+</div>
+</div>
+<div style="border-top:1px solid #2a1d13;margin-top:48px;padding-top:28px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap">
+<span style="font-size:13px;color:#e2c2a3;display:flex;gap:18px;flex-wrap:wrap;align-items:center">Copyright © 2026 Krypton. All rights reserved.<a href="#privacy" style="color:#bf9d80">Privacy Policy</a><a href="#terms" style="color:#bf9d80">Terms of Service</a></span>
+<span style="font-size:12px;color:#8e7462;max-width:430px;text-align:right;line-height:1.55">Krypton Client is a design demo and is not affiliated with Mojang AB.</span>
+</div>
+</div>
+</footer>
+
+<a id="toTop" href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;" aria-label="Back to top" style="position:fixed;right:28px;bottom:24px;width:44px;height:44px;border-radius:999px;border:1px solid #3c2b1d;background:#110c09;display:flex;align-items:center;justify-content:center;color:#efdcca"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 15l6-6 6 6"/></svg></a>
+</div>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var esc = function(t){ return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
+  var shield = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/></svg>';
+  var star = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg>';
+
+  var raw = [
+    ['combat','Combat','Aim Assist|Anchor Macro|Auto Crystal|Auto Double Hand|Auto Hit Crystal|Auto Inv Totem:r|Auto Jump Reset|Auto Totem:r|Crystal Optimizer|Double Anchor|Elytra Swap|HitBox:d|Hover Totem|Mace Bomber|Mace Swap|No Hit Delay|Shield Breaker|Spear Swap|Static HitBoxes:r|Totem Offhand|Trigger Bot'],
+    ['misc','Misc','Auto Clicker|Auto Eat|Auto Firework|Auto Log|Auto Loot|Auto Mine|Auto Reconnect|Auto Tool|Auto TPA|Auto Walk|Cord Snapper|Elytra Glide|Fakeplayer|Fast Place|Freecam|Key Pearl|Key Wind Charge|Name Protect|Skin Protect|Sprint|Weather Notifier'],
+    ['economy','Economy','Anti Trap|Auto Sell|Auto Spawner Sell|Chunk Finder|Pay Macro|Stats Viewer|Item Dropper|Netherite Finder|Player Chunks|Spawner Protect'],
+    ['base','BaseFinding','Block Entity Debug|Hole ESP|Light Finder|Prime Chunk Finder|RTP Base Finder:r|Sus Chunk Finder|Suspicious ESP|Tunnel Base Finder:d|Seed Chunk Finder'],
+    ['render','Render','Block ESP|Block Notifier|Free Look|Fullbright|HUD|Jump Circles|Mob ESP|Name Tags|Ore Sim|Pearl Trajectory|Player ESP|RealHitBox|Music HUD|Storage ESP|SwingSpeed|Target HUD'],
+    ['client','Client','Chat Macro|Discord Presence|Friends|Proxy|Radio']
+  ];
+  var st = { o:['b-ok','Stable'], r:['b-risk','Unstable'], d:['b-off','Disabled'] };
+  var n = {o:0,r:0,d:0};
+  var cats = raw.map(function(c){
+    var mods = c[2].split('|').map(function(s){ var p=s.split(':'), k=p[1]||'o'; n[k]++; return {n:p[0],k:k}; });
+    return {id:c[0],name:c[1],mods:mods};
+  });
+  $('nOk').textContent=n.o; $('nRisk').textContent=n.r; $('nOff').textContent=n.d;
+
+  var cat = 'all';
+  function renderModules(){
+    var tabs = [{id:'all',name:'All Modules'}].concat(cats);
+    $('tabs').innerHTML = tabs.map(function(t){
+      return '<button class="tab '+(t.id===cat?'tab-on':'')+'" data-cat="'+t.id+'">'+esc(t.name)+'</button>';
+    }).join('');
+    var shown = cat==='all' ? cats : cats.filter(function(c){return c.id===cat;});
+    $('shown').innerHTML = shown.map(function(c){
+      return '<div><div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px">'+
+        '<h3 style="margin:0;font-size:22px;font-weight:700;color:#fcf6f0">'+esc(c.name)+'</h3>'+
+        '<span style="font-size:13px;color:#bf9d80">'+c.mods.length+' modules</span></div><div class="mods-grid">'+
+        c.mods.map(function(m,mi){ return '<div class="mod pop" style="--i:'+mi+'"><span class="n">'+esc(m.n)+'</span><span class="badge '+st[m.k][0]+'">'+shield+st[m.k][1]+'</span></div>'; }).join('')+
+        '</div></div>';
+    }).join('');
+    $('shownCount').textContent = shown.reduce(function(a,c){return a+c.mods.length;},0);
+  }
+  $('tabs').addEventListener('click',function(e){ var b=e.target.closest('[data-cat]'); if(b){ cat=b.getAttribute('data-cat'); renderModules(); } });
+
+
+  var faqData = [
+    ['Is Krypton Client free?','Yes. Krypton Client is completely free. Download it, drop it in your mods folder and play. No account and no payment needed.'],
+    ['Is Krypton safe to use?','Krypton is a client-side mod. Always check the rules of the server you play on before enabling any module.'],
+    ['Will I get banned?','That depends on the server. Some modules are fine on most servers, others are not: read the server rules first.'],
+    ['How fast do I get access?','Instantly. Hit Free Download, grab the .jar and you are ready to go.'],
+    ['What if I change my PC?','Just download it again on the new one. Nothing is tied to your device.'],
+    ['Which version is supported?','Fabric 1.21.11. You also need Fabric API, which you can grab from the download section.']
+  ];
+  var openFaq = 0;
+  function renderFaq(){
+    var plusI = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#efdcca" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
+    $('faqs').innerHTML = faqData.map(function(d,i){
+      return '<div class="faq-item rv" style="--i:'+i+';border-radius:14px;background:#1d150f"><button class="faq" data-faq="'+i+'" aria-expanded="false"><span>'+d[0]+'</span><span class="faq-ic">'+plusI+'</span></button>'+
+        '<div class="faq-body"><div><p style="margin:0;padding:0 24px 22px;color:#e2c2a3;font-size:16px;line-height:1.65">'+d[1]+'</p></div></div></div>';
+    }).join('');
+    setFaq(0);
+  }
+  function setFaq(idx){
+    [].forEach.call($('faqs').children,function(el,i){
+      var o=i===idx; el.classList.toggle('open',o); el.style.background=o?'#2b1d12':'#1d150f';
+      el.querySelector('button').setAttribute('aria-expanded',o);
+    });
+    openFaq=idx;
+  }
+  $('faqs').addEventListener('click',function(e){ var b=e.target.closest('[data-faq]'); if(b){ var i=+b.getAttribute('data-faq'); setFaq(openFaq===i?-1:i); } });
+
+  var vids=[{id:'fecXcy1nvlU',t:0},{id:'D_8BAA_JFLU',t:0},{id:'5Z8ztXzjH88',t:0}];
+  $('videos').innerHTML = vids.map(function(v,i){
+    return '<button class="video" data-vid="'+v.id+'" data-t="'+v.t+'" aria-label="Play video '+(i+1)+'" style="padding:0;cursor:pointer;font:inherit">'+
+      '<img src="https://i.ytimg.com/vi/'+v.id+'/hqdefault.jpg" alt="" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">'+
+      '<span class="vshade"></span>'+
+      '<span class="vplay"><svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M8 5l12 7-12 7z"/></svg></span>'+
+      '<span style="position:absolute;right:14px;bottom:12px;font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px;text-shadow:0 1px 4px rgba(0,0,0,.6)">Watch on YouTube</span>'+
+      '</button>';
+  }).join('');
+  $('videos').addEventListener('click',function(e){
+    var b=e.target.closest('[data-vid]'); if(!b) return;
+    var f=document.createElement('iframe');
+    f.src='https://www.youtube-nocookie.com/embed/'+b.getAttribute('data-vid')+'?autoplay=1&rel=0&start='+b.getAttribute('data-t');
+    f.title='YouTube video'; f.allow='autoplay; encrypted-media; picture-in-picture; fullscreen'; f.allowFullscreen=true;
+    f.style.cssText='position:absolute;inset:0;width:100%;height:100%;border:0';
+    var wrap=document.createElement('div'); wrap.className='video'; wrap.appendChild(f);
+    b.replaceWith(wrap);
+  });
+
+  var reviewData = [
+    ['Setup took two minutes, smooth ever since','Lifetime'],
+    ['Base finder paid for itself day one','Lifetime'],
+    ['Cleanest menu I have used','Lifetime'],
+    ['Runs fine even on my old laptop','Lifetime'],
+    ['Support answered in like 5 min','Monthly'],
+    ['Updates drop fast, no complaints','Monthly']
+  ];
+  $('reviewList').innerHTML = reviewData.map(function(r){
+    return '<div class="card" style="padding:22px 20px 24px"><svg width="22" height="18" viewBox="0 0 22 18" fill="#4e3826" aria-hidden="true"><path d="M0 18V9.5C0 4 2.6 1 7.5 0l1 2.3C5.8 3.3 4.6 5 4.5 7.5H9V18zM13 18V9.5C13 4 15.6 1 20.5 0l1 2.3c-2.7 1-3.9 2.7-4 5.2H22V18z"/></svg>'+
+      '<div style="font-weight:700;font-size:14px;line-height:1.45;margin-top:14px;color:#fcf6f0">'+esc(r[0])+'</div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px"><span style="display:flex;gap:3px;color:#ffa552" aria-label="5 stars">'+star+star+star+star+star+'</span><span style="font-size:13px;color:#bf9d80">Krypton+ '+r[1]+'</span></div></div>';
+  }).join('');
+
+  renderModules(); renderFaq();
+
+  // ---- views: home vs modules ----
+  var homeV=$('homeView'), modV=$('modulesView');
+  var views={home:homeV,modules:modV,terms:$('termsView'),privacy:$('privacyView')}, curView=null;
+  function route(){
+    var h=location.hash||'#home', key=h.slice(1);
+    var name=views[key]&&key!=='home'?key:'home';
+    Object.keys(views).forEach(function(k){ views[k].hidden=(k!==name); });
+    document.querySelectorAll('.navlink[data-view]').forEach(function(a){ a.classList.toggle('active',a.getAttribute('data-view')===name); });
+    var shown=views[name], changed=curView!==name; curView=name;
+    if(changed){ shown.classList.remove('view-in'); void shown.offsetWidth; shown.classList.add('view-in'); }
+    if(name!=='home'||h==='#home'||h==='#top'){ window.scrollTo(0,0); }
+    else { var t=document.querySelector(h); if(t) requestAnimationFrame(function(){ t.scrollIntoView({behavior:changed?'auto':'smooth'}); }); }
+  }
+  window.addEventListener('hashchange',route); route();
+
+
+  // drifting pumpkins (hero + download section)
+  (function(){
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    function pumpkin(face){
+      return '<svg viewBox="0 0 64 60" aria-hidden="true">'+
+        '<path d="M31 13c-1-5 1-9 5-11l3 3c-3 2-4 4-3 8z" fill="#5d7b2f"/>'+
+        '<path d="M36 9c5-5 12-5 15-1-5 4-11 4-15 1z" fill="#76a03c"/>'+
+        '<ellipse cx="18" cy="36" rx="14" ry="19" fill="#d9561a"/>'+
+        '<ellipse cx="46" cy="36" rx="14" ry="19" fill="#d9561a"/>'+
+        '<ellipse cx="25" cy="36" rx="12" ry="21" fill="#ef6f22"/>'+
+        '<ellipse cx="39" cy="36" rx="12" ry="21" fill="#ef6f22"/>'+
+        '<ellipse cx="32" cy="36" rx="11" ry="22" fill="#ff8a2a"/>'+
+        '<path d="M27 20c-2 6-2 26 0 32M37 20c2 6 2 26 0 32" stroke="#d9561a" stroke-width="1.4" fill="none" opacity=".6"/>'+
+        '<ellipse cx="28" cy="25" rx="3" ry="6" fill="#ffc285" opacity=".45"/>'+
+        (face?'<g class="face" fill="#ffd66b"><path d="M20 31l6-6 3 7z"/><path d="M44 31l-6-6-3 7z"/><path d="M19 40c4 6 22 6 26 0l-3 6-3-3-3 4-3-4-3 4-3-4-3 3z"/></g>':'')+
+        '</svg>';
+    }
+    document.querySelectorAll('.pumpkins').forEach(function(box){
+      var n=box.closest('.hero')?10:12;
+      for(var k=0;k<n;k++){
+        var el=document.createElement('span'); el.className='pk';
+        var sz=18+Math.random()*30; el.style.width=sz+'px'; el.style.height=(sz*60/64)+'px';
+        el.style.left=(Math.random()*96)+'%';
+        el.style.opacity=(.35+Math.random()*.45).toFixed(2);
+        var d=16+Math.random()*16; el.style.animationDuration=d+'s'; el.style.animationDelay=(-Math.random()*d)+'s';
+        el.innerHTML=pumpkin(Math.random()<.45);
+        el.firstChild.style.animationDuration=(2.5+Math.random()*2)+'s';
+        box.appendChild(el);
+      }
+    });
+  })();
+
+  // mobile menu
+  var mb=$('menuBtn'), mm=$('mobileMenu');
+  mb.addEventListener('click',function(){ var o=mm.classList.toggle('open'); mb.setAttribute('aria-expanded',o); });
+  mm.addEventListener('click',function(e){ if(e.target.closest('a')){ mm.classList.remove('open'); mb.setAttribute('aria-expanded','false'); } });
+
+  // highlight Download / Reviews in the nav while those sections are on screen
+  var spy=[['download','#download'],['reviews','#reviews']];
+  var spyIO=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      var a=document.querySelector('.navlink[href="#'+e.target.id+'"]'); if(!a) return;
+      a.classList.toggle('active',e.isIntersecting);
+      var home=document.querySelector('.navlink[data-view="home"]');
+      if(homeV.hidden) return;
+      var any=spy.some(function(x){ var l=document.querySelector('.navlink[href="'+x[1]+'"]'); return l&&l.classList.contains('active'); });
+      home.classList.toggle('active',!any);
+    });
+  },{rootMargin:'-45% 0px -45% 0px'});
+  spy.forEach(function(x){ spyIO.observe(document.getElementById(x[0])); });
+
+  // ---- languages: EN / ES / DE ----
+  (function(){
+    var T = {
+      es: {
+        'Home':'Inicio','Modules':'Módulos','Download':'Descargar','Reviews':'Reseñas',
+        'Free Download':'Descarga gratis','100% free · Fabric 1.21.11':'100% gratis · Fabric 1.21.11',
+        '80+ modules. Lightweight. Built for survival servers.':'Más de 80 módulos. Ligero. Hecho para servidores de supervivencia.',
+        'Join Discord':'Únete a Discord','Why choose Krypton?':'¿Por qué elegir Krypton?',
+        'High Performance':'Alto rendimiento','No FPS drops. Runs light so you can actually play.':'Sin caídas de FPS. Va ligero para que puedas jugar de verdad.',
+        'Stable & Updated':'Estable y actualizado','Updated frequently. Always compatible with the latest game patches.':'Se actualiza a menudo. Siempre compatible con los últimos parches del juego.',
+        'Instant Download':'Descarga instantánea','No account, no payment, no waiting. Click download and you are in.':'Sin cuenta, sin pagos, sin esperas. Pulsa descargar y listo.',
+        'Easy to set up':'Fácil de instalar','Download it, put it in your mods folder. Done.':'Descárgalo, ponlo en tu carpeta de mods. Listo.',
+        'Grab the latest .jar from the download section':'Consigue el último .jar en la sección de descarga','Drop it in':'Colócalo',
+        'Place it in your mods folder':'Ponlo en tu carpeta de mods','Launch':'Inicia','Start the game and press Right Shift':'Abre el juego y pulsa Mayús derecha',
+        'Total users':'Usuarios totales','Growing this month':'Creciendo este mes','Compatible launchers':'Launchers compatibles',
+        'Works with Fabric 1.21.11 out of the box.':'Funciona con Fabric 1.21.11 desde el primer momento.',
+        'See':'Mira','in Action':'en acción','Watch Krypton on your favourite server':'Mira Krypton en tu servidor favorito','Watch on YouTube':'Ver en YouTube',
+        'DOWNLOAD':'DESCARGA','Get Krypton':'Consigue Krypton','Free download. Grab it and start playing.':'Descarga gratuita. Consíguelo y empieza a jugar.',
+        'Recommended':'Recomendado','Latest build · Fabric 1.21.11':'Última versión · Fabric 1.21.11','FREE':'GRATIS','€0 · forever':'0 € · para siempre',
+        'No payment, no account, no waiting. Download and start playing instantly.':'Sin pagos, sin cuenta, sin esperas. Descarga y juega al instante.',
+        'Auto base finding':'Búsqueda automática de bases','Auto-farm & utility':'Auto-farm y utilidades','Regular updates':'Actualizaciones frecuentes',
+        'Discord support':'Soporte en Discord','More free modules':'Más módulos gratis','No account needed':'Sin cuenta necesaria',
+        'Official Free Download':'Descarga oficial gratis','Needs Fabric API to run. Grab it alongside.':'Necesita Fabric API para funcionar. Descárgalo también.',
+        'Latest for 1.21.11':'Última para 1.21.11','Required':'Obligatorio',
+        'Required dependency for Krypton to run. Already have it in your mods folder? Skip this one.':'Dependencia necesaria para que Krypton funcione. ¿Ya la tienes en tu carpeta de mods? Sáltate este paso.',
+        'Official':'Oficial','INSTALL IN 3 STEPS':'INSTALA EN 3 PASOS','Download Krypton and Fabric API':'Descarga Krypton y Fabric API',
+        'Drop both':'Mete ambos archivos','files into':'en','Launch the Fabric 1.21.11 profile and press':'Abre el perfil de Fabric 1.21.11 y pulsa','Right Shift':'Mayús derecha',
+        'Download Fabric API':'Descargar Fabric API','What our users say':'Lo que dicen nuestros usuarios',
+        'Example reviews for this demo. Replace with real customer reviews.':'Reseñas de ejemplo para esta demo. Sustitúyelas por reseñas reales.',
+        'Setup took two minutes, smooth ever since':'La instalación tardó dos minutos y va perfecto desde entonces',
+        'Base finder paid for itself day one':'El buscador de bases valió la pena desde el primer día','Cleanest menu I have used':'El menú más limpio que he usado',
+        'Runs fine even on my old laptop':'Va bien incluso en mi portátil viejo','Support answered in like 5 min':'El soporte respondió en unos 5 minutos',
+        'Updates drop fast, no complaints':'Las actualizaciones llegan rápido, sin quejas',
+        'More reviews in our community':'Más reseñas en nuestra comunidad','Join the community: real feedback, instant support, latest updates.':'Únete a la comunidad: opiniones reales, soporte al instante, últimas novedades.',
+        'Frequently asked questions':'Preguntas frecuentes',
+        'Is Krypton Client free?':'¿Krypton Client es gratis?','Yes. Krypton Client is completely free. Download it, drop it in your mods folder and play. No account and no payment needed.':'Sí. Krypton Client es totalmente gratis. Descárgalo, ponlo en tu carpeta de mods y juega. Sin cuenta y sin pagos.',
+        'Is Krypton safe to use?':'¿Es seguro usar Krypton?','Krypton is a client-side mod. Always check the rules of the server you play on before enabling any module.':'Krypton es un mod del lado del cliente. Revisa siempre las normas del servidor en el que juegas antes de activar cualquier módulo.',
+        'Will I get banned?':'¿Me pueden banear?','That depends on the server. Some modules are fine on most servers, others are not: read the server rules first.':'Depende del servidor. Algunos módulos se permiten en la mayoría, otros no: lee primero las normas del servidor.',
+        'How fast do I get access?':'¿Cuánto tardo en tener acceso?','Instantly. Hit Free Download, grab the .jar and you are ready to go.':'Al instante. Pulsa Descarga gratis, consigue el .jar y listo.',
+        'What if I change my PC?':'¿Y si cambio de PC?','Just download it again on the new one. Nothing is tied to your device.':'Solo tienes que descargarlo de nuevo en el nuevo. Nada está vinculado a tu dispositivo.',
+        'Which version is supported?':'¿Qué versión es compatible?','Fabric 1.21.11. You also need Fabric API, which you can grab from the download section.':'Fabric 1.21.11. También necesitas Fabric API, que puedes conseguir en la sección de descarga.',
+        'All 82+ Modules':'Más de 82 módulos','Full list of modules and their current status.':'Lista completa de módulos y su estado actual.',
+        'Stable':'Estable','Unstable':'Inestable','Disabled':'Desactivado','All Modules':'Todos los módulos','Combat':'Combate','Misc':'Varios','Economy':'Economía',
+        'BaseFinding':'Búsqueda de bases','Client':'Cliente','Showing':'Mostrando','of 82 modules':'de 82 módulos',
+        'Navigation':'Navegación','Terms of Service':'Términos del servicio','Privacy Policy':'Política de privacidad','Socials':'Redes',
+        'Discord Server':'Servidor de Discord','Requirements':'Requisitos',
+        'Copyright © 2026 Krypton. All rights reserved.':'Copyright © 2026 Krypton. Todos los derechos reservados.',
+        'Krypton Client is a design demo and is not affiliated with Mojang AB.':'Krypton Client es una demo de diseño y no está afiliado a Mojang AB.',
+        'Back to home':'Volver al inicio'
+      },
+      de: {
+        'Home':'Start','Modules':'Module','Download':'Download','Reviews':'Bewertungen',
+        'Free Download':'Gratis-Download','100% free · Fabric 1.21.11':'100 % kostenlos · Fabric 1.21.11',
+        '80+ modules. Lightweight. Built for survival servers.':'Über 80 Module. Leichtgewichtig. Gemacht für Survival-Server.',
+        'Join Discord':'Discord beitreten','Why choose Krypton?':'Warum Krypton?',
+        'High Performance':'Hohe Leistung','No FPS drops. Runs light so you can actually play.':'Keine FPS-Einbrüche. Läuft so leicht, dass du wirklich spielen kannst.',
+        'Stable & Updated':'Stabil & aktuell','Updated frequently. Always compatible with the latest game patches.':'Regelmäßig aktualisiert. Immer kompatibel mit den neuesten Spiel-Patches.',
+        'Instant Download':'Sofort-Download','No account, no payment, no waiting. Click download and you are in.':'Kein Konto, keine Zahlung, kein Warten. Auf Download klicken und los.',
+        'Easy to set up':'Einfach einzurichten','Download it, put it in your mods folder. Done.':'Herunterladen, in den Mods-Ordner legen. Fertig.',
+        'Grab the latest .jar from the download section':'Hol dir die neueste .jar im Download-Bereich','Drop it in':'Reinlegen',
+        'Place it in your mods folder':'Leg sie in deinen Mods-Ordner','Launch':'Starten','Start the game and press Right Shift':'Starte das Spiel und drücke die rechte Umschalttaste',
+        'Total users':'Nutzer insgesamt','Growing this month':'Wächst diesen Monat','Compatible launchers':'Kompatible Launcher',
+        'Works with Fabric 1.21.11 out of the box.':'Funktioniert sofort mit Fabric 1.21.11.',
+        'See':'Sieh','in Action':'in Aktion','Watch Krypton on your favourite server':'Sieh Krypton auf deinem Lieblingsserver','Watch on YouTube':'Auf YouTube ansehen',
+        'DOWNLOAD':'DOWNLOAD','Get Krypton':'Hol dir Krypton','Free download. Grab it and start playing.':'Kostenloser Download. Holen und losspielen.',
+        'Recommended':'Empfohlen','Latest build · Fabric 1.21.11':'Neuester Build · Fabric 1.21.11','FREE':'GRATIS','€0 · forever':'0 € · für immer',
+        'No payment, no account, no waiting. Download and start playing instantly.':'Keine Zahlung, kein Konto, kein Warten. Herunterladen und sofort spielen.',
+        'Auto base finding':'Automatische Basensuche','Auto-farm & utility':'Auto-Farm & Utility','Regular updates':'Regelmäßige Updates',
+        'Discord support':'Discord-Support','More free modules':'Weitere Gratis-Module','No account needed':'Kein Konto nötig',
+        'Official Free Download':'Offizieller Gratis-Download','Needs Fabric API to run. Grab it alongside.':'Benötigt Fabric API. Lade sie gleich mit herunter.',
+        'Latest for 1.21.11':'Neueste für 1.21.11','Required':'Erforderlich',
+        'Required dependency for Krypton to run. Already have it in your mods folder? Skip this one.':'Erforderliche Abhängigkeit für Krypton. Schon in deinem Mods-Ordner? Dann überspringen.',
+        'Official':'Offiziell','INSTALL IN 3 STEPS':'IN 3 SCHRITTEN INSTALLIEREN','Download Krypton and Fabric API':'Krypton und Fabric API herunterladen',
+        'Drop both':'Beide','files into':'Dateien in','Launch the Fabric 1.21.11 profile and press':'Starte das Fabric-1.21.11-Profil und drücke','Right Shift':'rechte Umschalttaste',
+        'Download Fabric API':'Fabric API herunterladen','What our users say':'Was unsere Nutzer sagen',
+        'Example reviews for this demo. Replace with real customer reviews.':'Beispielbewertungen für diese Demo. Durch echte Bewertungen ersetzen.',
+        'Setup took two minutes, smooth ever since':'Einrichtung in zwei Minuten, läuft seitdem rund',
+        'Base finder paid for itself day one':'Der Basenfinder hat sich am ersten Tag gelohnt','Cleanest menu I have used':'Das aufgeräumteste Menü, das ich kenne',
+        'Runs fine even on my old laptop':'Läuft sogar auf meinem alten Laptop gut','Support answered in like 5 min':'Der Support hat in etwa 5 Minuten geantwortet',
+        'Updates drop fast, no complaints':'Updates kommen schnell, keine Beschwerden',
+        'More reviews in our community':'Mehr Bewertungen in unserer Community','Join the community: real feedback, instant support, latest updates.':'Tritt der Community bei: echtes Feedback, schneller Support, neueste Updates.',
+        'Frequently asked questions':'Häufige Fragen',
+        'Is Krypton Client free?':'Ist Krypton Client kostenlos?','Yes. Krypton Client is completely free. Download it, drop it in your mods folder and play. No account and no payment needed.':'Ja. Krypton Client ist komplett kostenlos. Herunterladen, in den Mods-Ordner legen und spielen. Kein Konto, keine Zahlung.',
+        'Is Krypton safe to use?':'Ist Krypton sicher?','Krypton is a client-side mod. Always check the rules of the server you play on before enabling any module.':'Krypton ist ein clientseitiger Mod. Prüfe immer die Regeln des Servers, bevor du ein Modul aktivierst.',
+        'Will I get banned?':'Werde ich gebannt?','That depends on the server. Some modules are fine on most servers, others are not: read the server rules first.':'Das hängt vom Server ab. Manche Module sind auf den meisten Servern erlaubt, andere nicht: Lies zuerst die Serverregeln.',
+        'How fast do I get access?':'Wie schnell habe ich Zugriff?','Instantly. Hit Free Download, grab the .jar and you are ready to go.':'Sofort. Klick auf Gratis-Download, hol dir die .jar und los geht’s.',
+        'What if I change my PC?':'Was, wenn ich den PC wechsle?','Just download it again on the new one. Nothing is tied to your device.':'Lade es einfach auf dem neuen PC erneut herunter. Nichts ist an dein Gerät gebunden.',
+        'Which version is supported?':'Welche Version wird unterstützt?','Fabric 1.21.11. You also need Fabric API, which you can grab from the download section.':'Fabric 1.21.11. Du brauchst außerdem Fabric API, die du im Download-Bereich findest.',
+        'All 82+ Modules':'Alle 82+ Module','Full list of modules and their current status.':'Vollständige Liste aller Module und ihres aktuellen Status.',
+        'Stable':'Stabil','Unstable':'Instabil','Disabled':'Deaktiviert','All Modules':'Alle Module','Combat':'Kampf','Misc':'Sonstiges','Economy':'Wirtschaft',
+        'BaseFinding':'Basensuche','Client':'Client','Showing':'Zeige','of 82 modules':'von 82 Modulen',
+        'Navigation':'Navigation','Terms of Service':'Nutzungsbedingungen','Privacy Policy':'Datenschutzerklärung','Socials':'Socials',
+        'Discord Server':'Discord-Server','Requirements':'Voraussetzungen',
+        'Copyright © 2026 Krypton. All rights reserved.':'Copyright © 2026 Krypton. Alle Rechte vorbehalten.',
+        'Krypton Client is a design demo and is not affiliated with Mojang AB.':'Krypton Client ist eine Design-Demo und steht in keiner Verbindung zu Mojang AB.',
+        'Back to home':'Zurück zur Startseite'
+      }
+    };
+    var hero = { en:['The','most','powerful','client'], es:['El cliente','más','potente','de todos'], de:['Der','wohl','mächtigste','Client'] };
+    var plural = { es:function(n){return n+' módulos';}, de:function(n){return n+' Module';} };
+    var lang = 'en';
+    try { lang = localStorage.getItem('nebula-lang') || 'en'; } catch(e){}
+    if(!T[lang] && lang!=='en') lang='en';
+
+    function translateNode(n){
+      if(n.__en===undefined) n.__en = n.nodeValue;
+      var src=n.__en, key=src.trim(); if(!key) return;
+      var out=null;
+      if(lang!=='en'){
+        out = T[lang][key];
+        var m = !out && key.match(/^(\d+) modules$/); if(m) out = plural[lang](m[1]);
+      }
+      var lead=src.match(/^\s*/)[0], trail=src.match(/\s*$/)[0];
+      var val = out ? lead+out+trail : src;
+      if(n.nodeValue!==val) n.nodeValue=val;
+    }
+    function walk(root){
+      var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:function(n){
+        var p=n.parentElement; if(!p||/SCRIPT|STYLE|CODE|KBD/.test(p.tagName)) return 2;
+        if(p.closest('.hero h1,#langBtn,.lang-menu,.mod,.legal p,.legal li,.legal h1,.legal h2,.legal-date')) return 2;
+        return 1; }});
+      var n; while((n=w.nextNode())) translateNode(n);
+    }
+    function apply(){
+      document.documentElement.lang = lang;
+      var words=document.querySelectorAll('.hero h1 .w');
+      hero[lang].forEach(function(t,i){ if(words[i]) words[i].textContent=t; });
+      var code=$('langBtn').childNodes; for(var i=0;i<code.length;i++){ if(code[i].nodeType===3 && code[i].nodeValue.trim()){ code[i].nodeValue=' '+lang.toUpperCase()+' '; break; } }
+      document.querySelectorAll('.lang-menu button').forEach(function(b){ b.setAttribute('aria-checked', b.getAttribute('data-lang')===lang); });
+      walk(document.body);
+    }
+    // re-translate anything the page renders later (module tabs, FAQ)
+    var busy=false;
+    new MutationObserver(function(ms){ if(busy||lang==='en') return; busy=true;
+      ms.forEach(function(m){ m.addedNodes.forEach(function(n){ if(n.nodeType===1) walk(n); else if(n.nodeType===3) translateNode(n); }); });
+      busy=false; }).observe(document.body,{childList:true,subtree:true});
+
+    var codes=['en','es','de'];
+    document.querySelectorAll('.lang-menu button').forEach(function(b,i){
+      b.setAttribute('data-lang',codes[i]); b.setAttribute('role','menuitemradio');
+      b.addEventListener('click',function(){ lang=codes[i]; try{ localStorage.setItem('nebula-lang',lang); }catch(e){} apply(); });
+    });
+    apply();
+  })();
+  // ---- motion ----
+  var nav=document.querySelector('.nav'), top=$('toTop');
+  function onScroll(){ var y=window.scrollY; nav.classList.toggle('scrolled',y>10); top.classList.toggle('show',y>600); }
+  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+
+  var lang=document.querySelector('.lang');
+  $('langBtn').addEventListener('click',function(e){ e.stopPropagation(); var o=lang.classList.toggle('open'); this.setAttribute('aria-expanded',o); });
+  document.addEventListener('click',function(){ lang.classList.remove('open'); $('langBtn').setAttribute('aria-expanded','false'); });
+
+  // reveal on scroll: headings, paragraphs and grid children, staggered per parent
+  var sel='section .h2, section .h2 + p, section > div > .card, section > div > div > .card, #videos > .video, #download .dl-card, #reviewList > div, section .badge.b-ok, section .badge.b-risk, section .badge.b-off, #modulesView h3, .foot, footer > div > div:last-child';
+  var groups=new Map();
+  document.querySelectorAll(sel).forEach(function(el){
+    if(el.closest('.hero')) return;
+    var par=el.parentElement, n=groups.get(par)||0; groups.set(par,n+1);
+    el.classList.add('rv'); el.style.setProperty('--i',n);
+  });
+  // pre-existing rv items (FAQ) count too
+  var io=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ var el=e.target; el.classList.add('in'); io.unobserve(el); setTimeout(function(){ el.classList.remove('rv','in'); },1600); } }); },{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.rv').forEach(function(el){ io.observe(el); });
+
+  // setup steps + user counter
+  var stepsBox=document.querySelector('.step-line').parentElement, cnt=$('userCount'), started=false;
+  var io2=new IntersectionObserver(function(es){ es.forEach(function(e){ if(!e.isIntersecting||started) return; started=true;
+    stepsBox.classList.add('steps-in');
+    var target=+cnt.getAttribute('data-target'), t0=null, dur=1800;
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){ cnt.textContent=target.toLocaleString('en-US'); return; }
+    function tick(t){ if(!t0)t0=t; var k=Math.min(1,(t-t0)/dur), v=Math.round(target*(1-Math.pow(1-k,3))); cnt.textContent=v.toLocaleString('en-US'); if(k<1) requestAnimationFrame(tick); }
+    requestAnimationFrame(tick); }); },{threshold:.35});
+  io2.observe(stepsBox);
+
+})();
+</script>
+</body>
+</html>
